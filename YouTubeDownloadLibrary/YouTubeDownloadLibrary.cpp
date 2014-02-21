@@ -5,32 +5,20 @@
 #include "YouTubeDownloadLibrary.h"
 #include <stdexcept>
 
-using namespace std;
+// OpenSSl Library
+#include <openssl\bio.h>
+#include <openssl\ssl.h>
+#include <openssl\err.h>
 
 namespace YouTubeDownloadLibrary
 {
-	double YouTubeDownload::Add(double a, double b)
+	std::string YouTubeDownload::GetLink(std::string, int encode[], int size)
 	{
-		return a + b;
+		return std::string();
 	}
 
-	double YouTubeDownload::Subtract(double a, double b)
+	int YouTubeDownload::DownloadToHDD (std::string link, std::fstream file)
 	{
-		return a - b;
-	}
-
-	double YouTubeDownload::Multiply(double a, double b)
-	{
-		return a * b;
-	}
-
-	double YouTubeDownload::Divide(double a, double b)
-	{
-		if (b == 0)
-		{
-			throw invalid_argument("b cannot be zero!");
-		}
-
-		return a / b;
+		return 0;
 	}
 }
