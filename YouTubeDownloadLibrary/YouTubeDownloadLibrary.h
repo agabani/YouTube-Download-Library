@@ -12,16 +12,12 @@ namespace YouTubeDownloadLibrary
 	class YouTubeDownload
 	{
 	public:
-		// Returns a + b
-		static YOUTUBEDOWNLOADLIBRARY_API double Add(double a, double b);
+		// Not implimented
+		static YOUTUBEDOWNLOADLIBRARY_API
+			std::string GetLink (std::string videoID, int encoding[], int size);
 
-		// Returns a - b
-		static YOUTUBEDOWNLOADLIBRARY_API double Subtract(double a, double b);
-
-		// Returns a * b
-		static YOUTUBEDOWNLOADLIBRARY_API double Multiply(double a, double b);
-
-		// Returns a / b
-		static YOUTUBEDOWNLOADLIBRARY_API double Divide(double a, double b);
+		// Not implimented
+		static YOUTUBEDOWNLOADLIBRARY_API
+			int DownloadToHDD (std::string link, std::fstream file);
 	};
 }
