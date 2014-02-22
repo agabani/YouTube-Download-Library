@@ -2,51 +2,56 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #include "YouTubeDownloadLibrary.h"
 
 int main (int argc, char * argv[])
 {
-	std::vector<YouTubeDownloadLibrary::Video> videos = YouTubeDownloadLibrary::YouTubeDownload::GetLink("E4XqGyCa5Vo");
+	std::string videoID = "uwpQZpTFMrg";
+	std::vector<YouTubeDownloadLibrary::Video> videos = YouTubeDownloadLibrary::YouTubeDownload::GetLink(videoID);
 
 	YouTubeDownloadLibrary::Video video;
 
 	int result =
 		YouTubeDownloadLibrary::YouTubeDownload::SearchVideo (
 		videos,
-		YouTubeDownloadLibrary::YouTubeDownload::Container::MP4,
+		YouTubeDownloadLibrary::YouTubeDownload::Container::WEBM,
 		true,
 		video
 		);
 
-	if (result == 0)
-	{
-		std::cout << "Video Found" << std::endl;
-		std::cout << "Container: ";
-		switch (video.GetContainer())
+	if (result != 0) {
+		return -1;
+	}
+
+	std::string filename;
+
+	switch (video.GetContainer())
 		{
 		case YouTubeDownloadLibrary::YouTubeDownload::Container::FLV:
-			std::cout << "FLV" << std::endl;
+			filename = videoID + ".flv";
 			break;
 		case YouTubeDownloadLibrary::YouTubeDownload::Container::MP4:
-			std::cout << "MP4" << std::endl;
+			filename = videoID + ".mp4";
 			break;
 		case YouTubeDownloadLibrary::YouTubeDownload::Container::_3PG:
-			std::cout << "3PG" << std::endl;
+			filename = videoID + ".3pg";
 			break;
 		case YouTubeDownloadLibrary::YouTubeDownload::Container::WEBM:
-			std::cout << "WEBM" << std::endl;
+			filename = videoID + ".webm";
 			break;
 		default:
+			return -1;
 			break;
 		}
-		std::cout << "itag: " << video.GetITag() << std::endl;
-		std::cout << "Resolution: " << video.GetResolution() << std::endl;
-		std::cout << "Type: " << video.GetType() << std::endl;
-		std::cout << "URL:" << std::endl << video.GetURL() << std::endl;
-	} else {
-		std::cout << "Video not Found" << std::endl;
-	}
+
+	std::fstream file;
+
+	file.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
+	YouTubeDownloadLibrary::YouTubeDownload::DownloadToHDD(video.GetURL(), file);
+
+	file.close();
 
 	return 0;
 }

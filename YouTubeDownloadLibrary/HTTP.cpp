@@ -99,4 +99,92 @@ namespace YouTubeDownloadLibrary
 
 		return decode;
 	}
+
+
+	int HTTP::DownloadFile (std::string address, std::fstream& file)
+	{
+		// Get hostname
+		//		std::cout << link << std::endl;
+		std::string hostname, uri;
+
+		int beg, end;
+
+		beg = address.find("//");
+		end = address.find("/",++++beg);
+
+		hostname = address.substr(beg, end - beg);
+		uri = address.substr(end);
+
+		//		std::cout << hostname << std::endl;
+		//		std::cout << uri << std::endl;
+
+		// Create request
+		std::string request;
+		int result = HTTP::CreateGetRequest(hostname, uri, request);
+
+		//		std::cout << request << std::endl;
+
+		// Connect to host
+		std::string link = hostname + ":80";
+		BIO* bio = BIO_new_connect(&link[0]);
+
+		if (bio == NULL) {
+			ERR_print_errors_fp(stderr);
+			return -1;
+		}
+
+		// Send request
+		BIO_puts(bio, request.c_str());
+
+		// Download
+		std::string downloadStream, httpHeader;
+		int bytes = -1;
+
+		while (1) {
+			downloadStream.resize(MaxBufSize);
+
+			int x = BIO_read(bio, &downloadStream[0], downloadStream.length());
+			downloadStream.resize(x);
+
+			if (x == 0) {
+				break;
+			}
+			else if (x < 0) {
+				if (!BIO_should_retry(bio)) {
+					BIO_free_all(bio);
+					return -1;
+				}
+			}
+			else {
+				// check if http header is complete
+				int pos = httpHeader.find(NewLine + NewLine);
+
+				// if not complete
+				if (pos == std::string::npos) {
+					// check for send of header in current stream
+					pos = downloadStream.find(NewLine + NewLine);
+
+					// if end of header is not found dump all of stream into header and continue
+					if (pos == std::string::npos) {
+						httpHeader.append(downloadStream);
+						continue;
+					}
+
+					// else copy the remaining header into the header and dump the rest of the stream into the file
+					else {
+						httpHeader.append(downloadStream.substr(0,pos + std::string(NewLine + NewLine).length()));
+						file << downloadStream.substr(pos + std::string(NewLine + NewLine).length());
+						continue;
+					}
+				}
+				
+				// but if complete, dump stream into file
+				else {
+					file << downloadStream;
+				}
+			}
+		}
+
+		return 0;
+	}
 }
