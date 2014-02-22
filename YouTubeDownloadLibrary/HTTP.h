@@ -15,8 +15,11 @@ namespace YouTubeDownloadLibrary
 		// Does full http exchange
 		static int Exchange (std::string address, std::string request, std::string &response);
 
-		// decodes url encoding
+		// Decodes url encoding
 		static std::string UrlDecode (std::string url);
+
+		// 
+		static int DownloadFile (std::string address, std::fstream& file, bool displayProgress);
 
 	private:
 		static const int MaxBufSize;

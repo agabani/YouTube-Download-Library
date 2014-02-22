@@ -34,7 +34,7 @@ namespace YouTubeDownloadLibrary
 
 	int YouTubeDownload::SearchVideo (std::vector <Video> videos, Container container, Resolution resolution, Video& result)
 	{
-		for (int i = 0; i < videos.size(); i++)
+		for (unsigned int i = 0; i < videos.size(); i++)
 		{
 			if (videos.at(i).GetContainer() == container && videos.at(i).GetResolution() == resolution)
 			{
@@ -51,7 +51,7 @@ namespace YouTubeDownloadLibrary
 	{
 		int best = -1; // Invalid start value (error checking)
 
-		for (int i = 0; i < videos.size(); i++)
+		for (unsigned int i = 0; i < videos.size(); i++)
 		{
 			if ( videos.at(i).GetContainer() == container )
 			{
@@ -83,8 +83,10 @@ namespace YouTubeDownloadLibrary
 	}
 
 
-	int YouTubeDownload::DownloadToHDD (std::string link, std::fstream file)
+	int YouTubeDownload::DownloadToHDD (std::string link, std::fstream& file, bool displayProgress)
 	{
+		int result = HTTP::DownloadFile(link, file, displayProgress);
+
 		return 0;
 	}
 }

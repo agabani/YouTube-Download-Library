@@ -41,7 +41,7 @@ namespace YouTubeDownloadLibrary
 
 		// Not implimented
 		static YOUTUBEDOWNLOADLIBRARY_API
-			int DownloadToHDD (std::string link, std::fstream file);
+			int DownloadToHDD (std::string link, std::fstream& file, bool displayProgress);
 	};
 
 
