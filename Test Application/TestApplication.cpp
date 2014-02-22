@@ -8,17 +8,17 @@
 
 int main (int argc, char * argv[])
 {
-	std::string videoID = "uwpQZpTFMrg";
+	std::string videoID = "-U-hf6go8as";
 	std::vector<YouTubeDownloadLibrary::Video> videos = YouTubeDownloadLibrary::YouTubeDownload::GetLink(videoID);
 
 	YouTubeDownloadLibrary::Video video;
 
 	int result =
 		YouTubeDownloadLibrary::YouTubeDownload::SearchVideo (
-		videos,
-		YouTubeDownloadLibrary::YouTubeDownload::Container::WEBM,
-		true,
-		video
+			videos,
+			YouTubeDownloadLibrary::YouTubeDownload::Container::MP4,
+			true,
+			video
 		);
 
 	if (result != 0) {
@@ -49,9 +49,11 @@ int main (int argc, char * argv[])
 	std::fstream file;
 
 	file.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
-	YouTubeDownloadLibrary::YouTubeDownload::DownloadToHDD(video.GetURL(), file);
+	YouTubeDownloadLibrary::YouTubeDownload::DownloadToHDD(video.GetURL(), file, true);
 
 	file.close();
+
+	std::cin.get();
 
 	return 0;
 }

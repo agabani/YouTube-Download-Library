@@ -19,7 +19,7 @@ namespace YouTubeDownloadLibrary
 		static std::string UrlDecode (std::string url);
 
 		// 
-		static int DownloadFile (std::string address, std::fstream& file);
+		static int DownloadFile (std::string address, std::fstream& file, bool displayProgress);
 
 	private:
 		static const int MaxBufSize;

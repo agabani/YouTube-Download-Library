@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "http.h"
+#include <math.h>
 
 // OpenSSl Library
 #include <openssl\bio.h>
@@ -101,7 +102,7 @@ namespace YouTubeDownloadLibrary
 	}
 
 
-	int HTTP::DownloadFile (std::string address, std::fstream& file)
+	int HTTP::DownloadFile (std::string address, std::fstream& file, bool displayProgress)
 	{
 		// Get hostname
 		//		std::cout << link << std::endl;
@@ -138,7 +139,7 @@ namespace YouTubeDownloadLibrary
 
 		// Download
 		std::string downloadStream, httpHeader;
-		int bytes = -1;
+		int totalBytes, downloadedBytes, displayedBytes;
 
 		while (1) {
 			downloadStream.resize(MaxBufSize);
@@ -170,10 +171,27 @@ namespace YouTubeDownloadLibrary
 						continue;
 					}
 
-					// else copy the remaining header into the header and dump the rest of the stream into the file
+					// else copy the remaining header into the header and dump the rest of the stream into the file and get file size
 					else {
 						httpHeader.append(downloadStream.substr(0,pos + std::string(NewLine + NewLine).length()));
 						file << downloadStream.substr(pos + std::string(NewLine + NewLine).length());
+
+						// Get total file size
+						beg = httpHeader.find("Content-Length: ") + std::string("Content-Length: ").length();
+						end = httpHeader.find(NewLine, beg);
+
+						std::stringstream ss;
+						ss << httpHeader.substr(beg, end-beg);
+						ss >> totalBytes;
+
+						if (displayProgress == true) {
+							std::cout << "File Size: " << (double)totalBytes / 1024 / 1024 << "MB" << std::endl;
+						}
+
+						// Add downloaded bytes to monitor
+						downloadedBytes = downloadStream.substr(pos + std::string(NewLine + NewLine).length()).length();
+						displayedBytes = 0;
+
 						continue;
 					}
 				}
@@ -181,10 +199,37 @@ namespace YouTubeDownloadLibrary
 				// but if complete, dump stream into file
 				else {
 					file << downloadStream;
+
+					// Add downloaded bytes to monitor
+					downloadedBytes += x;
+
+					// display progress bar every few bytes
+					if (displayProgress == true) {
+						
+						if (downloadedBytes > (displayedBytes + 200*1024) || downloadedBytes == totalBytes)
+						{
+							int totaldotz=40;
+							double fractiondownloaded = (double)(downloadedBytes) / (double)totalBytes;
+							int dotz = fractiondownloaded * totaldotz;
+
+							int ii=0;
+							printf("%3.0f%% [",fractiondownloaded*100);
+							for ( ; ii < dotz;ii++) {
+								printf("=");
+							}
+							for ( ; ii < totaldotz;ii++) {
+								 printf(" ");
+							}
+							printf("]\r");
+							fflush(stdout);
+
+							displayedBytes = downloadedBytes;
+						}
+					}
 				}
 			}
 		}
 
-		return 0;
+		return totalBytes - downloadedBytes;
 	}
 }
