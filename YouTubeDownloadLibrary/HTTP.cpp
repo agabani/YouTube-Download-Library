@@ -1,21 +1,34 @@
-#include "stdafx.h"
+// http.cpp : Defines the functions for HTTP class.
+//
 
+#include "stdafx.h"
+#include <stdexcept>
+
+#include "http.h"
 
 // OpenSSl Library
 #include <openssl\bio.h>
 #include <openssl\ssl.h>
 #include <openssl\err.h>
 
-
-namespace HTTP
+namespace YouTubeDownloadLibrary
 {
-	// Constant Definitions
-	const int MaxBufSize = 4092;
-	const std::string UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0";
-	const std::string NewLine = "\r\n";
+	const int HTTP::MaxBufSize = 4092;
+	const std::string HTTP::UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0";
+	const std::string HTTP::NewLine = "\r\n";
 
 
-	int CreateGetRequest (std::string host, std::string uri, std::string& result)
+	HTTP::HTTP ()
+	{
+	}
+
+
+	HTTP::~HTTP ()
+	{
+	}
+
+
+	int HTTP::CreateGetRequest (std::string host, std::string uri, std::string& result)
 	{
 		result  =
 			"GET " + uri + " HTTP/1.1" + NewLine +
@@ -28,7 +41,7 @@ namespace HTTP
 	}
 
 
-	int Exchange (std::string address, std::string request, std::string &response)
+	int HTTP::Exchange (std::string address, std::string request, std::string &response)
 	{
 		BIO* bio = BIO_new_connect(&address[0]);
 
@@ -64,8 +77,7 @@ namespace HTTP
 		return 0;
 	}
 
-
-	std::string UrlDecode (std::string url)
+	std::string HTTP::UrlDecode (std::string url)
 	{
 		std::string decode;
 		std::stringstream ss;
