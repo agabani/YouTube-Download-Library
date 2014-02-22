@@ -73,24 +73,24 @@ namespace YouTubeDownloadLibrary
 					video.fallback_host = entries.at(i).at(j).substr(14);
 				}
 				else if (entries.at(i).at(j).find("itag=") == 0) {
-				video.itag = entries.at(i).at(j).substr(5);
+					video.itag = entries.at(i).at(j).substr(5);
 				}
 				else if (entries.at(i).at(j).find("quality=") == 0) {
-				video.quality = entries.at(i).at(j).substr(8);
+					video.quality = entries.at(i).at(j).substr(8);
 				}
 				else if (entries.at(i).at(j).find("sig=") == 0) {
-				video.sig = entries.at(i).at(j).substr(4);
+					video.sig = entries.at(i).at(j).substr(4);
 				}
 				else if (entries.at(i).at(j).find("type=") == 0) {
-				video.type = HTTP::UrlDecode(entries.at(i).at(j).substr(5));
+					video.type = HTTP::UrlDecode(entries.at(i).at(j).substr(5));
 				}
 				else if (entries.at(i).at(j).find("url=") == 0) {
-				video.url = HTTP::UrlDecode(entries.at(i).at(j).substr(4));
+					video.url = HTTP::UrlDecode(entries.at(i).at(j).substr(4));
 				}
 				
 			}
 
-			if ( video.isValid() )
+			if ( video.Validate() )
 			{
 				videos.push_back(video);
 			}
