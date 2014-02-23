@@ -1,5 +1,36 @@
-// video.cpp : Defines the functions for Video class.
-//
+/**
+ * @file video.cpp
+ * @author agabani
+ * @version 1.0
+ *
+ * @section LICENCE
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * @section DESCRIPTION
+ *
+ * Class representing the information contained by a video.
+ *
+ */
 
 #include "stdafx.h"
 #include <stdexcept>
@@ -58,7 +89,7 @@ namespace YouTubeDownloadLibrary
 	{
 		if (fallback_host.empty() || itag.empty() || quality.empty() || sig.empty() || type.empty() || url.empty())
 		{
-			return false;
+			return false; // Failure. All required fields is not available.
 		}
 
 		// Obtain container, resolution, and 3D
@@ -67,7 +98,7 @@ namespace YouTubeDownloadLibrary
 		int result;
 		ss >> result;
 
-		// Container
+		// Identify the video's container.
 		switch (result)
 		{
 			// 3GP
@@ -91,11 +122,11 @@ namespace YouTubeDownloadLibrary
 			break;
 
 		default:
-			return false;
+			return false; // Failure. File itag not supported.
 			break;
 		}
 
-		// Resolution
+		// Identify the video's resolution.
 		switch (result)
 		{
 			// NA
@@ -144,10 +175,11 @@ namespace YouTubeDownloadLibrary
 			break;
 
 		default:
-			return false;
+			return false; // Failure. File itag not supported.
 			break;
 		}
 
+		// Identifies if video has 3D properties.
 		switch (result)
 		{
 			// Non 3D
@@ -162,11 +194,11 @@ namespace YouTubeDownloadLibrary
 			break;
 
 		default:
-			return false;
+			return false; // Failure. File itag not supported.
 			break;
 		}
 
-		return true;
+		return true; // Succuess.
 
 	}
 }

@@ -1,16 +1,48 @@
-// http.cpp : Defines the functions for HTTP class.
-//
+/**
+ * @file http.cpp
+ * @author agabani
+ * @version 1.0
+ *
+ * @section LICENCE
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * @section DESCRIPTION
+ *
+ * Class that impliments commonly used network functions used for HTTP client
+ * applications.
+ *
+ */
 
 #include "stdafx.h"
 #include <stdexcept>
 
 #include "http.h"
-#include <math.h>
 
 // OpenSSl Library
 #include <openssl\bio.h>
 #include <openssl\ssl.h>
 #include <openssl\err.h>
+
 
 namespace YouTubeDownloadLibrary
 {
@@ -104,79 +136,78 @@ namespace YouTubeDownloadLibrary
 
 	int HTTP::DownloadFile (std::string address, std::fstream& file, bool displayProgress)
 	{
-		// Get hostname
-		//		std::cout << link << std::endl;
-		std::string hostname, uri;
+		// Extracts host and uri from address.
+		int beg = address.find("//");
+		int end = address.find("/",++++beg);
+		std::string hostname = address.substr(beg, end - beg);
+		std::string uri = address.substr(end);
 
-		int beg, end;
-
-		beg = address.find("//");
-		end = address.find("/",++++beg);
-
-		hostname = address.substr(beg, end - beg);
-		uri = address.substr(end);
-
-		//		std::cout << hostname << std::endl;
-		//		std::cout << uri << std::endl;
-
-		// Create request
+		// Creates GET request.
 		std::string request;
 		int result = HTTP::CreateGetRequest(hostname, uri, request);
 
-		//		std::cout << request << std::endl;
-
-		// Connect to host
+		// Connects to host.
 		std::string link = hostname + ":80";
 		BIO* bio = BIO_new_connect(&link[0]);
 
 		if (bio == NULL) {
 			ERR_print_errors_fp(stderr);
-			return -1;
+			return -1; // Failure.
 		}
 
-		// Send request
+		// Send GET request to host.
 		BIO_puts(bio, request.c_str());
 
-		// Download
+		// Download file from host.
 		std::string downloadStream, httpHeader;
 		int totalBytes, downloadedBytes, displayedBytes;
 
 		while (1) {
+			// Set read buffer to maximum size.
 			downloadStream.resize(MaxBufSize);
 
+			// Read recieved packet and resize read buffer accordingly.
 			int x = BIO_read(bio, &downloadStream[0], downloadStream.length());
 			downloadStream.resize(x);
 
+			// If download complete...
 			if (x == 0) {
-				break;
+				break; // Exit download loop.
 			}
+			// If connection lost...
 			else if (x < 0) {
+				// If retry limit has been reached...
 				if (!BIO_should_retry(bio)) {
 					BIO_free_all(bio);
-					return -1;
+					return -1; // Failure.
 				}
 			}
+			// If data is in the read buffer...
 			else {
-				// check if http header is complete
+				// Check if the header is complete by looking for the double newline in the stored header.
 				int pos = httpHeader.find(NewLine + NewLine);
 
-				// if not complete
+				// If complete header was not found in stored header...
 				if (pos == std::string::npos) {
-					// check for send of header in current stream
+					// Check for end of header in the read buffer.
 					pos = downloadStream.find(NewLine + NewLine);
 
-					// if end of header is not found dump all of stream into header and continue
+					// If the end of the header was not found...
 					if (pos == std::string::npos) {
+						// Append all data in read buffer to header and start next read cycle.
 						httpHeader.append(downloadStream);
 						continue;
 					}
 
-					// else copy the remaining header into the header and dump the rest of the stream into the file and get file size
+					// If the end of header was found in the read buffer...
 					else {
+						// Copy the remaining header to the header.
 						httpHeader.append(downloadStream.substr(0,pos + std::string(NewLine + NewLine).length()));
+
+						// Write the remaining data to give file.
 						file << downloadStream.substr(pos + std::string(NewLine + NewLine).length());
 
-						// Get total file size
+						// Extract the content size of body and store for future reference.
 						beg = httpHeader.find("Content-Length: ") + std::string("Content-Length: ").length();
 						end = httpHeader.find(NewLine, beg);
 
@@ -184,30 +215,34 @@ namespace YouTubeDownloadLibrary
 						ss << httpHeader.substr(beg, end-beg);
 						ss >> totalBytes;
 
+						// If user wishes to display download feedback...
 						if (displayProgress == true) {
+							// Display exact filesize in MB.
 							std::cout << "File Size: " << (double)totalBytes / 1024 / 1024 << "MB" << std::endl;
 						}
 
-						// Add downloaded bytes to monitor
+						// Add downloaded bytes to monitor and start next read cycle.
 						downloadedBytes = downloadStream.substr(pos + std::string(NewLine + NewLine).length()).length();
 						displayedBytes = 0;
-
 						continue;
 					}
 				}
 				
-				// but if complete, dump stream into file
+				// If header is complete...
 				else {
+					// Write contents of read buffer to file.
 					file << downloadStream;
 
-					// Add downloaded bytes to monitor
+					// Add downloaded bytes to monitor.
 					downloadedBytes += x;
 
-					// display progress bar every few bytes
+					// If user wants to display download feedback...
 					if (displayProgress == true) {
 						
+						// If 200KB has been downloaded since the last time the feedback GUI has been updated.
 						if (downloadedBytes > (displayedBytes + 200*1024) || downloadedBytes == totalBytes)
 						{
+							// Draw feedback GUI.
 							int totaldotz=40;
 							double fractiondownloaded = (double)(downloadedBytes) / (double)totalBytes;
 							int dotz = fractiondownloaded * totaldotz;
@@ -223,6 +258,7 @@ namespace YouTubeDownloadLibrary
 							printf("]\r");
 							fflush(stdout);
 
+							// Update the previous recording of bytes displayed to the current number of bytes downloaded.
 							displayedBytes = downloadedBytes;
 						}
 					}
@@ -230,6 +266,7 @@ namespace YouTubeDownloadLibrary
 			}
 		}
 
+		// Return the remaining number of bytes to download.
 		return totalBytes - downloadedBytes;
 	}
 }
