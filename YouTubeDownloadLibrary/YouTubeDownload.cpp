@@ -46,6 +46,12 @@ const std::string Port = "80";
 
 namespace YouTubeDownloadLibrary
 {
+	std::string YouTubeDownload::GetVersion ()
+	{
+		return "1.0.0";
+	}
+
+
 	std::vector <Video> YouTubeDownload::GetLink(std::string vid)
 	{
 		// Request and obtain raw video information from youtube.
