@@ -118,6 +118,11 @@ namespace YouTubeDownloadLibrary
 	int YouTubeDownload::DownloadToHDD (std::string link, std::fstream& file, bool displayProgress)
 	{
 		int result = HTTP::DownloadFile(link, file, displayProgress);
+
+		if (displayProgress == true) {
+			std::cout << std::endl;
+		}
+
 		return 0;
 	}
 }
