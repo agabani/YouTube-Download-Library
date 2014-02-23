@@ -74,7 +74,7 @@ namespace YouTubeDownloadLibrary
 	class FMT; // INTERNAL ONLY
 	class Video;
 	class YouTubeDownload;
-	
+
 
 	/**
 	 * @class	YouTubeDownload
@@ -88,6 +88,21 @@ namespace YouTubeDownloadLibrary
 	class YouTubeDownload
 	{
 	public:
+
+		/**
+		 * @fn		std::string YouTubeDownload::GetVersion();
+		 *
+		 * @brief	Gets the library .dll version.
+		 *
+		 * @author	agabani
+		 * @date	23/02/2014
+		 *
+		 * @return	Library .dll version.
+		 */
+
+		static YOUTUBEDOWNLOADLIBRARY_API
+			std::string GetVersion();
+
 
 		/**
 		 * @enum	Container
