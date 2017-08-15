@@ -1,9 +1,13 @@
-YouTube Download Library
-========================
+# YouTube Download Library
+
+## This project is depreciated
+
 Lightweight c++ library for downloading videos directly from YouTube.
 
 Version: 1.0.0 
+
 License: MIT
+
 Files: YouTube-Download-Library / VERSION / 1.0.0
 
 Installation
